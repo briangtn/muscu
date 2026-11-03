@@ -13,30 +13,29 @@
     </div>
     <span class="elapsed"><app-icon name="clock" /> {{ elapsedMin() }} min</span>
   </header>
-  <div class="segments">
-    @for (segment of segments(); track $index) {
-      <span [class]="segment"></span>
-    }
-  </div>
-
   @if (step(); as s) {
     @let ex = exercise()!;
-    <!-- Partie opérationnelle : tient dans l'écran sans scroller -->
+    <!-- Partie opérationnelle : occupe exactement la hauteur de l'écran, le détail commence sous la ligne de flottaison -->
+    <div class="screen">
+    <div class="segments">
+      @for (segment of segments(); track $index) {
+        <span [class]="segment"></span>
+      }
+    </div>
     <section class="head">
-      <button class="thumb-btn" (click)="showDetails()" aria-label="Voir comment faire l'exercice">
-        <app-exercise-animation [images]="ex.images" [alt]="ex.name" [compact]="true" />
-      </button>
-      <div class="head-text">
-        <h1 class="ex-name">{{ ex.name }}</h1>
-        <p class="target">
-          {{ describeStep(s, ex) }}
-          @if (s.restSec) {
-            <span class="muted"> · repos {{ formatDuration(s.restSec) }}</span>
-          }
-        </p>
-        <button class="how-link" (click)="showDetails()">Comment faire <app-icon name="chevronRight" /></button>
-      </div>
+      <h1 class="ex-name">{{ ex.name }}</h1>
+      <p class="target">
+        {{ describeStep(s, ex) }}
+        @if (s.restSec) {
+          <span class="muted"> · repos {{ formatDuration(s.restSec) }}</span>
+        }
+      </p>
     </section>
+    <!-- L'animation prend toute la place libre : grande sur un grand écran, réduite sur un petit -->
+    <button class="media" (click)="showDetails()" aria-label="Voir comment faire l'exercice">
+      <app-exercise-animation [images]="ex.images" [alt]="ex.name" [fill]="true" />
+      <span class="how-chip">Comment faire <app-icon name="chevronRight" /></span>
+    </button>
 
     @if (s.note) {
       <p class="note">{{ s.note }}</p>
@@ -122,12 +121,17 @@
     @if (nextExercise(); as next) {
       <p class="up-next">Ensuite · <strong>{{ next.name }}</strong></p>
     }
+    </div>
 
     <!-- Détail de l'exercice, accessible en scrollant -->
     <h2 class="section-title details-title" id="details">Comment faire</h2>
-    <app-exercise-animation [images]="ex.images" [alt]="ex.name" />
     <app-exercise-details [exercise]="ex" />
   } @else {
+    <div class="segments">
+      @for (segment of segments(); track $index) {
+        <span [class]="segment"></span>
+      }
+    </div>
     <section class="finish">
       <div class="finish-badge"><app-icon name="check" /></div>
       <h1 class="large-title">Bravo !</h1>

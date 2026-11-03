@@ -5,10 +5,14 @@ import { Icon } from './icon';
 @Component({
   selector: 'app-exercise-animation',
   imports: [Icon],
-  host: { '[class.compact]': 'compact()' },
+  host: { '[class.fill]': 'fill()' },
   template: `
     @if (images().length) {
       <div class="frames">
+        @if (fill()) {
+          <!-- Fond flouté pour combler les bords quand le cadre n'a pas le ratio de la photo -->
+          <img class="backdrop" [src]="images()[0]" alt="" crossorigin="anonymous" />
+        }
         @for (src of images(); track src; let i = $index) {
           <img [src]="src" [alt]="alt() + ', position ' + (i + 1)" crossorigin="anonymous" [class.visible]="i === frame()" />
         }
@@ -82,24 +86,26 @@ import { Icon } from './icon';
       font-size: 40px;
       color: var(--label-3);
     }
-    /* Vignette dans l'en-tête de séance */
-    :host(.compact) .frames {
-      border-radius: 12px;
-      box-shadow: none;
+    /* Remplit le conteneur parent au lieu de garder un ratio fixe */
+    :host(.fill) .frames {
+      position: absolute;
+      inset: 0;
+      aspect-ratio: auto;
     }
-    :host(.compact) .dots,
-    :host(.compact) .placeholder span {
-      display: none;
-    }
-    :host(.compact) .placeholder app-icon {
-      font-size: 28px;
+    img.backdrop {
+      inset: -24px;
+      width: calc(100% + 48px);
+      height: calc(100% + 48px);
+      object-fit: cover;
+      opacity: 1;
+      filter: blur(22px) saturate(1.3) brightness(0.9);
     }
   `,
 })
 export class ExerciseAnimation {
   readonly images = input.required<string[]>();
   readonly alt = input('');
-  readonly compact = input(false);
+  readonly fill = input(false);
   protected readonly frame = signal(0);
 
   constructor() {

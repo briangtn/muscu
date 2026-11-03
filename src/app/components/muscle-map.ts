@@ -75,6 +75,7 @@ const MIRROR = 'matrix(-1 0 0 1 120 0)';
 @Component({
   selector: 'app-muscle-map',
   template: `
+    <div class="layout">
     <div class="figures" role="img" [attr.aria-label]="summary()">
       @for (view of views; track view.label) {
         <figure>
@@ -110,6 +111,7 @@ const MIRROR = 'matrix(-1 0 0 1 120 0)';
       }
     </div>
 
+    <div class="side">
     <div class="chips">
       @for (m of muscles().primary; track m) {
         <span class="chip primary">{{ labels[m] }}</span>
@@ -124,21 +126,32 @@ const MIRROR = 'matrix(-1 0 0 1 120 0)';
         <span><i class="dot secondary"></i>Secondaire</span>
       }
     </div>
+    </div>
+    </div>
   `,
   styles: `
     :host {
       display: block;
     }
-    .figures {
+    /* Silhouettes compactes à gauche, noms des muscles à droite */
+    .layout {
       display: flex;
-      justify-content: center;
-      gap: 12px;
+      align-items: center;
+      gap: 16px;
+    }
+    .figures {
+      flex: none;
+      display: flex;
+      gap: 6px;
     }
     figure {
-      flex: 1;
-      max-width: 150px;
+      width: 68px;
       margin: 0;
       text-align: center;
+    }
+    .side {
+      flex: 1;
+      min-width: 0;
     }
     svg {
       display: block;
@@ -146,8 +159,8 @@ const MIRROR = 'matrix(-1 0 0 1 120 0)';
       overflow: visible;
     }
     figcaption {
-      margin-top: 6px;
-      font-size: 12px;
+      margin-top: 4px;
+      font-size: 10px;
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.06em;
@@ -161,7 +174,7 @@ const MIRROR = 'matrix(-1 0 0 1 120 0)';
       transition: fill 0.4s ease;
     }
     .muscle.primary {
-      filter: drop-shadow(0 0 3px rgb(255 45 85 / 0.55));
+      filter: drop-shadow(0 0 2px rgb(255 45 85 / 0.55));
       animation: pulse 2.6s ease-in-out infinite;
     }
     .muscle.secondary {
@@ -181,9 +194,7 @@ const MIRROR = 'matrix(-1 0 0 1 120 0)';
     .chips {
       display: flex;
       flex-wrap: wrap;
-      justify-content: center;
       gap: 6px;
-      margin-top: 16px;
     }
     .chip {
       padding: 5px 11px;
@@ -201,8 +212,8 @@ const MIRROR = 'matrix(-1 0 0 1 120 0)';
     }
     .legend {
       display: flex;
-      justify-content: center;
-      gap: 16px;
+      flex-wrap: wrap;
+      gap: 4px 12px;
       margin-top: 10px;
       font-size: 12px;
       color: var(--label-2);
