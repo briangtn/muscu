@@ -1,24 +1,60 @@
 import { Component, computed, inject } from '@angular/core';
-import { Icon } from '../../components/icon';
+import { Icon, IconName } from '../../components/icon';
 import { findExercise } from '../../data/exercises';
 import { PROGRAM } from '../../data/program';
 import { formatClock, formatDate, formatKg, formatSpeed, minutesBetween } from '../../format';
 import { SetLog, WorkoutLog } from '../../models';
+import { EntryStatus, entryStatus, isCountedExercise } from '../../session-report';
 import { WorkoutStore } from '../../workout-store';
+
+interface ReportLine {
+  name: string;
+  status: EntryStatus;
+  detail: string;
+  bonus: boolean;
+}
 
 interface HistoryItem {
   log: WorkoutLog;
   title: string;
   date: string;
   minutes: number;
-  setCount: number;
-  lines: { name: string; sets: string }[];
+  doneExercises: number;
+  totalExercises: number;
+  bonusCount: number;
+  lines: ReportLine[];
 }
+
+const STATUS_ICONS: Record<EntryStatus, IconName> = {
+  done: 'check',
+  partial: 'half',
+  skipped: 'skip',
+  notReached: 'minus',
+};
 
 function describeSet(set: SetLog): string {
   if (set.speed != null) return `${formatClock(set.durationSec ?? 0)} à ${formatSpeed(set.speed)}, pente ${set.incline} %`;
   if (set.durationSec !== null) return formatClock(set.durationSec);
-  return set.weight !== null ? `${formatKg(set.weight)} × ${set.reps}` : `${set.reps}`;
+  return set.weight !== null ? `${formatKg(set.weight)} × ${set.reps}` : `${set.reps} reps`;
+}
+
+function reportLine(log: WorkoutLog, index: number): ReportLine {
+  const entry = log.entries[index];
+  const status = entryStatus(log, index);
+  const done = entry.sets.filter((s) => s.done);
+  const sets = done.map(describeSet).join(' · ');
+  const detail = {
+    done: sets,
+    partial: `${done.length}/${entry.sets.length} séries · ${sets}`,
+    skipped: 'Passé',
+    notReached: 'Non fait, séance arrêtée avant',
+  }[status];
+  return {
+    name: findExercise(entry.exerciseId)?.name ?? entry.exerciseId,
+    status,
+    detail,
+    bonus: entry.block === 'bonus',
+  };
 }
 
 @Component({
@@ -31,29 +67,39 @@ function describeSet(set: SetLog): string {
     @for (item of items(); track item.log.id) {
       <details class="session">
         <summary>
-          <span class="letter">{{ item.log.templateId }}</span>
+          <span class="letter" [class.stopped]="item.log.stoppedAt !== undefined">{{ item.log.templateId }}</span>
           <span class="grow">
             <span class="title">{{ item.title }}</span>
             <span class="date">{{ item.date }}</span>
-          </span>
-          <span class="meta">
-            <span>{{ item.minutes }} min</span>
-            <span>{{ item.setCount }} séries</span>
+            <span class="tags">
+              <span class="tag">{{ item.minutes }} min</span>
+              <span class="tag">{{ item.doneExercises }}/{{ item.totalExercises }} exercices</span>
+              @if (item.log.stoppedAt !== undefined) {
+                <span class="tag orange">Écourtée</span>
+              }
+              @if (item.bonusCount) {
+                <span class="tag accent">+{{ item.bonusCount }} bonus</span>
+              }
+            </span>
           </span>
           <app-icon class="chevron" name="chevronRight" />
         </summary>
-        @if (item.lines.length) {
-          <ul>
-            @for (line of item.lines; track $index) {
-              <li>
-                <span class="exercise">{{ line.name }}</span>
-                <span class="sets">{{ line.sets }}</span>
-              </li>
-            }
-          </ul>
-        } @else {
-          <p class="empty">Aucune série validée.</p>
-        }
+        <ul>
+          @for (line of item.lines; track $index) {
+            <li [class]="line.status">
+              <span class="status"><app-icon [name]="statusIcons[line.status]" /></span>
+              <span class="line-text">
+                <span class="exercise">
+                  {{ line.name }}
+                  @if (line.bonus) {
+                    <span class="bonus-label">Bonus</span>
+                  }
+                </span>
+                <span class="detail">{{ line.detail }}</span>
+              </span>
+            </li>
+          }
+        </ul>
       </details>
     } @empty {
       <div class="empty-state">
@@ -84,6 +130,7 @@ function describeSet(set: SetLog): string {
     }
     .letter {
       flex: none;
+      align-self: flex-start;
       display: grid;
       place-items: center;
       width: 40px;
@@ -93,6 +140,9 @@ function describeSet(set: SetLog): string {
       color: #ffffff;
       background: var(--gradient);
       border-radius: 11px;
+    }
+    .letter.stopped {
+      background: linear-gradient(135deg, #ff9500, #ffcc00);
     }
     .grow {
       flex: 1;
@@ -110,12 +160,27 @@ function describeSet(set: SetLog): string {
     .date::first-letter {
       text-transform: uppercase;
     }
-    .meta {
+    .tags {
       display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      font-size: 13px;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-top: 6px;
+    }
+    .tag {
+      padding: 2px 8px;
+      font-size: 12px;
+      font-weight: 600;
       color: var(--label-2);
+      background: var(--fill);
+      border-radius: 999px;
+    }
+    .tag.orange {
+      color: var(--orange);
+      background: var(--orange-soft);
+    }
+    .tag.accent {
+      color: var(--accent);
+      background: var(--accent-soft);
     }
     .chevron {
       transition: transform 0.2s ease;
@@ -125,29 +190,69 @@ function describeSet(set: SetLog): string {
     }
     ul {
       margin: 0;
-      padding: 0 16px 6px 68px;
+      padding: 0 16px 6px;
       list-style: none;
     }
     li {
       display: flex;
-      flex-direction: column;
+      gap: 10px;
       padding: 9px 0;
       border-top: 0.5px solid var(--separator);
+    }
+    .status {
+      flex: none;
+      display: grid;
+      place-items: center;
+      width: 22px;
+      height: 22px;
+      margin-top: 1px;
+      font-size: 12px;
+      border-radius: 50%;
+    }
+    .done .status {
+      color: #ffffff;
+      background: var(--green);
+    }
+    .partial .status {
+      color: var(--orange);
+      background: var(--orange-soft);
+    }
+    .skipped .status,
+    .notReached .status {
+      color: var(--label-2);
+      background: var(--fill);
+    }
+    .line-text {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
     }
     .exercise {
       font-size: 15px;
       font-weight: 500;
     }
-    .sets {
+    .skipped .exercise,
+    .notReached .exercise {
+      color: var(--label-2);
+    }
+    .bonus-label {
+      margin-left: 4px;
+      padding: 1px 6px;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--accent);
+      background: var(--accent-soft);
+      border-radius: 999px;
+      vertical-align: 1px;
+    }
+    .detail {
       font-size: 13px;
       color: var(--label-2);
       font-variant-numeric: tabular-nums;
     }
-    .empty {
-      margin: 0;
-      padding: 0 16px 14px 68px;
-      font-size: 15px;
-      color: var(--label-2);
+    .partial .detail {
+      color: var(--orange);
     }
     .empty-state {
       padding: 60px 20px;
@@ -168,22 +273,20 @@ function describeSet(set: SetLog): string {
 })
 export class History {
   private readonly store = inject(WorkoutStore);
+  protected readonly statusIcons = STATUS_ICONS;
 
   protected readonly items = computed(() =>
     [...this.store.history()].reverse().map((log): HistoryItem => {
-      const done = log.entries
-        .map((entry) => ({
-          name: findExercise(entry.exerciseId)?.name ?? entry.exerciseId,
-          sets: entry.sets.filter((s) => s.done),
-        }))
-        .filter((line) => line.sets.length > 0);
+      const counted = log.entries.filter(isCountedExercise);
       return {
         log,
         title: PROGRAM[log.templateId].name,
         date: formatDate(log.finishedAt ?? log.startedAt),
         minutes: log.finishedAt ? minutesBetween(log.startedAt, log.finishedAt) : 0,
-        setCount: done.reduce((n, line) => n + line.sets.length, 0),
-        lines: done.map((line) => ({ name: line.name, sets: line.sets.map(describeSet).join(' · ') })),
+        doneExercises: counted.filter((e) => e.sets.some((s) => s.done)).length,
+        totalExercises: counted.length,
+        bonusCount: log.entries.filter((e) => e.block === 'bonus').length,
+        lines: log.entries.map((_, i) => reportLine(log, i)),
       };
     }),
   );

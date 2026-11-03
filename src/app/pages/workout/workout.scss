@@ -50,13 +50,22 @@
 }
 
 .elapsed {
-  justify-self: end;
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  font-size: 15px;
+  gap: 3px;
+  font-size: 12px;
   font-variant-numeric: tabular-nums;
   color: var(--label-2);
+}
+
+.stop {
+  justify-self: end;
+  padding: 6px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--accent);
+  background: none;
+  border: 0;
 }
 
 .segments {
@@ -73,6 +82,15 @@
 
     &.done {
       background: var(--accent);
+    }
+
+    &.partial {
+      background: linear-gradient(90deg, var(--accent) 50%, var(--fill-strong) 50%);
+    }
+
+    &.skipped {
+      background: var(--label-3);
+      opacity: 0.5;
     }
 
     &.current {
@@ -452,6 +470,11 @@
   border-radius: 50%;
   box-shadow: 0 14px 34px rgb(255 45 85 / 0.35);
   animation: pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  &.stopped {
+    background: linear-gradient(135deg, #ff9500, #ffcc00);
+    box-shadow: 0 14px 34px rgb(255 149 0 / 0.35);
+  }
 }
 
 .tiles {
@@ -468,6 +491,12 @@
   background: var(--card);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
+}
+
+.tile-value small {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--label-2);
 }
 
 .tile-value {

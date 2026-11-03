@@ -8,10 +8,13 @@
         <span class="nav-eyebrow">{{ blockLabels[s.block] }}</span>
         <span class="nav-title">Étape {{ cursor() + 1 }} sur {{ steps().length }}</span>
       } @else {
-        <span class="nav-title">Terminé</span>
+        <span class="nav-title">{{ stopped() ? 'Séance écourtée' : 'Terminé' }}</span>
       }
+      <span class="elapsed"><app-icon name="clock" /> {{ elapsedMin() }} min</span>
     </div>
-    <span class="elapsed"><app-icon name="clock" /> {{ elapsedMin() }} min</span>
+    @if (step()) {
+      <button class="stop" (click)="stopWorkout()">Arrêter</button>
+    }
   </header>
   @if (step(); as s) {
     @let ex = exercise()!;
@@ -133,17 +136,26 @@
       }
     </div>
     <section class="finish">
-      <div class="finish-badge"><app-icon name="check" /></div>
-      <h1 class="large-title">Bravo !</h1>
-      <p class="muted">Séance terminée</p>
+      @if (stopped()) {
+        <div class="finish-badge stopped"><app-icon name="close" /></div>
+        <h1 class="large-title">Séance écourtée</h1>
+        <p class="muted">Arrêtée à l'étape {{ log()!.stoppedAt! + 1 }} sur {{ steps().length }}. Ce qui est fait est fait !</p>
+      } @else {
+        <div class="finish-badge"><app-icon name="check" /></div>
+        <h1 class="large-title">Bravo !</h1>
+        <p class="muted">Séance terminée</p>
+      }
       <div class="tiles">
         <div class="tile"><span class="tile-value">{{ elapsedMin() }}</span><span class="tile-label">minutes</span></div>
-        <div class="tile"><span class="tile-value">{{ doneExercises() }}</span><span class="tile-label">exercices</span></div>
+        <div class="tile">
+          <span class="tile-value">{{ doneExercises() }}<small>/{{ totalExercises() }}</small></span>
+          <span class="tile-label">exercices</span>
+        </div>
         <div class="tile"><span class="tile-value">{{ doneSets() }}</span><span class="tile-label">séries</span></div>
       </div>
       <p class="muted footnote">Tes charges, reps et réglages du tapis serviront de base à la prochaine séance.</p>
 
-      @if (bonusOptions().length) {
+      @if (bonusOptions().length && !stopped()) {
         <section class="bonus">
           <h2 class="bonus-title">Envie d'en faire plus ?</h2>
           <p class="muted small">Choisis un ou plusieurs exercices bonus, ils s'ajoutent à la séance.</p>
@@ -179,7 +191,11 @@
       }
 
       <button class="btn btn-gradient btn-block" (click)="finish()">Enregistrer la séance</button>
-      <button class="btn btn-plain btn-block" (click)="goTo(steps().length - 1)">Revenir au dernier exercice</button>
+      @if (stopped()) {
+        <button class="btn btn-plain btn-block" (click)="resumeWorkout()">Reprendre la séance</button>
+      } @else {
+        <button class="btn btn-plain btn-block" (click)="goTo(steps().length - 1)">Revenir au dernier exercice</button>
+      }
     </section>
   }
 
@@ -210,8 +226,13 @@
         <button class="btn back" (click)="goTo(cursor() - 1)" [disabled]="cursor() === 0" aria-label="Étape précédente">
           <app-icon name="chevronLeft" />
         </button>
-        <button class="btn btn-primary next" (click)="goTo(cursor() + 1)">
-          {{ isLastStep() ? 'Terminer' : 'Suivant' }}
+        <!-- Sans série faite, le bouton principal devient « Passer » : l'exercice sera noté comme passé -->
+        <button class="btn next" [class.btn-primary]="hasDoneSet()" [class.btn-tinted]="!hasDoneSet()" (click)="goTo(cursor() + 1)">
+          @if (hasDoneSet()) {
+            {{ isLastStep() ? 'Terminer' : 'Suivant' }}
+          } @else {
+            {{ isLastStep() ? 'Passer et terminer' : 'Passer l’exercice' }}
+          }
           <app-icon name="chevronRight" />
         </button>
       </div>

@@ -9,6 +9,7 @@ import { PROGRAM, stepsOf } from '../../data/program';
 import { alertUser, keepScreenOn } from '../../device';
 import { describeStep, formatClock, formatDuration, minutesBetween } from '../../format';
 import { BLOCK_LABELS, SetLog, Step } from '../../models';
+import { entryStatus, isCountedExercise } from '../../session-report';
 import { WorkoutStore } from '../../workout-store';
 
 const secondsLeft = (endsAt: number, now: number) => Math.max(0, Math.ceil((endsAt - now) / 1000));
@@ -57,14 +58,20 @@ export class Workout {
     return step ? this.store.suggest(step) : null;
   });
   protected readonly activeSet = computed(() => this.entry()?.sets.findIndex((s) => !s.done) ?? -1);
-  /** Une barre par étape : faite, en cours ou à venir. */
+  /** Une barre par étape : faite, partielle, passée, en cours ou à venir. */
   protected readonly segments = computed(() => {
     const log = this.log();
     if (!log) return [];
-    return log.entries.map((entry, i) =>
-      i === log.cursor ? 'current' : entry.sets.some((s) => s.done) || i < log.cursor ? 'done' : '',
-    );
+    return log.entries.map((_, i) => {
+      if (i === log.cursor) return 'current';
+      const status = entryStatus(log, i);
+      if (status === 'done' || status === 'partial') return status;
+      return status === 'skipped' && i < log.cursor ? 'skipped' : '';
+    });
   });
+  /** Au moins une série faite sur l'exercice affiché : sinon le bouton principal propose de le passer. */
+  protected readonly hasDoneSet = computed(() => !!this.entry()?.sets.some((s) => s.done));
+  protected readonly stopped = computed(() => this.log()?.stoppedAt !== undefined);
 
   private readonly now = signal(Date.now());
   protected readonly restEndsAt = signal<number | null>(null);
@@ -91,11 +98,9 @@ export class Workout {
     () => this.log()?.entries.reduce((n, e) => n + e.sets.filter((s) => s.done).length, 0) ?? 0,
   );
   protected readonly doneExercises = computed(
-    () =>
-      this.log()?.entries.filter(
-        (e) => (e.block === 'strength' || e.block === 'bonus') && e.exerciseId !== 'treadmill' && e.sets.some((s) => s.done),
-      ).length ?? 0,
+    () => this.log()?.entries.filter((e) => isCountedExercise(e) && e.sets.some((s) => s.done)).length ?? 0,
   );
+  protected readonly totalExercises = computed(() => this.log()?.entries.filter(isCountedExercise).length ?? 0);
   protected readonly elapsedMin = computed(() => {
     const log = this.log();
     return log ? minutesBetween(log.startedAt, new Date(this.now()).toISOString()) : 0;
@@ -204,6 +209,19 @@ export class Workout {
     if (!steps.length) return;
     this.selectedBonus.set(new Set());
     this.store.addBonus(steps);
+    window.scrollTo({ top: 0 });
+  }
+
+  protected stopWorkout(): void {
+    if (!confirm('Arrêter la séance maintenant ? Les séries déjà faites seront enregistrées.')) return;
+    this.resetTimer();
+    this.restEndsAt.set(null);
+    this.store.stop();
+    window.scrollTo({ top: 0 });
+  }
+
+  protected resumeWorkout(): void {
+    this.store.resume();
     window.scrollTo({ top: 0 });
   }
 

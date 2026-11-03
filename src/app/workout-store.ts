@@ -79,6 +79,22 @@ export class WorkoutStore {
     );
   }
 
+  /** Arrête la séance avant la fin : on passe à l'écran de fin en notant l'étape atteinte. */
+  stop(): void {
+    this.currentSignal.update(
+      (log) => log && { ...log, stoppedAt: log.cursor, cursor: stepsOf(log).length },
+    );
+  }
+
+  /** Annule un arrêt et revient à l'étape où on s'était arrêté. */
+  resume(): void {
+    this.currentSignal.update((log) => {
+      if (!log) return log;
+      const { stoppedAt, ...rest } = log;
+      return { ...rest, cursor: Math.min(stoppedAt ?? log.cursor, stepsOf(log).length - 1) };
+    });
+  }
+
   updateSet(entryIndex: number, setIndex: number, patch: Partial<SetLog>): void {
     this.currentSignal.update(
       (log) =>

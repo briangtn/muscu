@@ -11,7 +11,7 @@
       @if (store.current()!.cursor < currentSteps()) {
         Étape {{ store.current()!.cursor + 1 }} sur {{ currentSteps() }}
       } @else {
-        Terminée, il ne reste qu'à l'enregistrer
+        {{ store.current()!.stoppedAt !== undefined ? 'Écourtée' : 'Terminée' }}, il ne reste qu'à l'enregistrer
       }
     </p>
     <div class="hero-progress"><div [style.width.%]="currentProgress()"></div></div>

@@ -85,6 +85,8 @@ export interface WorkoutLog {
   entries: EntryLog[];
   /** Exercices bonus ajoutés en fin de séance, à la suite des étapes du programme. */
   extraSteps?: Step[];
+  /** Étape à laquelle la séance a été arrêtée avant la fin ; absent si la séance est allée au bout. */
+  stoppedAt?: number;
 }
 
 export const MUSCLE_LABELS: Record<MuscleId, string> = {
