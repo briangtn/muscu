@@ -8,8 +8,8 @@
     <p class="hero-eyebrow">Séance en cours</p>
     <h2 class="hero-title">{{ template.name }}</h2>
     <p class="hero-sub">
-      @if (store.current()!.cursor < template.steps.length) {
-        Étape {{ store.current()!.cursor + 1 }} sur {{ template.steps.length }}
+      @if (store.current()!.cursor < currentSteps()) {
+        Étape {{ store.current()!.cursor + 1 }} sur {{ currentSteps() }}
       } @else {
         Terminée, il ne reste qu'à l'enregistrer
       }

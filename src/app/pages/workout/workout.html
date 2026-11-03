@@ -6,7 +6,7 @@
     <div class="nav-center">
       @if (step(); as s) {
         <span class="nav-eyebrow">{{ blockLabels[s.block] }}</span>
-        <span class="nav-title">Étape {{ cursor() + 1 }} sur {{ t.steps.length }}</span>
+        <span class="nav-title">Étape {{ cursor() + 1 }} sur {{ steps().length }}</span>
       } @else {
         <span class="nav-title">Terminé</span>
       }
@@ -142,8 +142,44 @@
         <div class="tile"><span class="tile-value">{{ doneSets() }}</span><span class="tile-label">séries</span></div>
       </div>
       <p class="muted footnote">Tes charges, reps et réglages du tapis serviront de base à la prochaine séance.</p>
+
+      @if (bonusOptions().length) {
+        <section class="bonus">
+          <h2 class="bonus-title">Envie d'en faire plus ?</h2>
+          <p class="muted small">Choisis un ou plusieurs exercices bonus, ils s'ajoutent à la séance.</p>
+          <div class="list" style="--separator-inset: 80px">
+            @for (option of bonusOptions(); track option.step.exerciseId) {
+              <button
+                class="row bonus-row"
+                [class.selected]="selectedBonus().has(option.step.exerciseId)"
+                [attr.aria-pressed]="selectedBonus().has(option.step.exerciseId)"
+                (click)="toggleBonus(option.step.exerciseId)"
+              >
+                @if (option.exercise.images.length) {
+                  <img class="thumb" [src]="option.exercise.images[0]" alt="" crossorigin="anonymous" />
+                } @else {
+                  <span class="thumb thumb-empty"></span>
+                }
+                <span class="grow">
+                  <span class="title">{{ option.exercise.name }}</span>
+                  <span class="subtitle">{{ describeStep(option.step, option.exercise) }} · ≈ {{ option.minutes }} min</span>
+                </span>
+                <span class="select-dot"><app-icon name="check" /></span>
+              </button>
+            }
+          </div>
+          <button class="btn btn-tinted btn-block" [disabled]="selectedBonus().size === 0" (click)="addBonus()">
+            @if (selectedBonus().size === 0) {
+              Sélectionne un bonus
+            } @else {
+              Ajouter {{ selectedBonus().size }} bonus · ≈ {{ selectedMinutes() }} min
+            }
+          </button>
+        </section>
+      }
+
       <button class="btn btn-gradient btn-block" (click)="finish()">Enregistrer la séance</button>
-      <button class="btn btn-plain btn-block" (click)="goTo(t.steps.length - 1)">Revenir au dernier exercice</button>
+      <button class="btn btn-plain btn-block" (click)="goTo(steps().length - 1)">Revenir au dernier exercice</button>
     </section>
   }
 

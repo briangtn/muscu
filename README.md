@@ -16,6 +16,7 @@ Application web mobile (PWA) pour suivre mes séances de musculation : programme
 - **Saisie rapide** des charges, reps, vitesse et pente du tapis avec des boutons − / +, pré-remplis depuis la séance précédente.
 - **Double progression** : quand toutes les séries atteignent le haut de la fourchette de reps, la charge augmente d'un palier.
 - **Minuteurs** de repos et d'exercices chronométrés, avec bip et flash à la fin. L'écran reste allumé pendant la séance.
+- **Exercices bonus** proposés en fin de séance quand on a encore de l'énergie, choisis pour compléter la séance du jour.
 - **Historique** des séances.
 - **Installable sur iPhone** (Safari → Partager → Sur l'écran d'accueil) et **utilisable hors ligne**.
 

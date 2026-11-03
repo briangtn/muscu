@@ -391,6 +391,55 @@
   }
 }
 
+// Bonus proposés en fin de séance
+.bonus {
+  margin: 28px 0 8px;
+  text-align: left;
+
+  .list {
+    margin-top: 12px;
+  }
+
+  .btn {
+    margin-top: 12px;
+  }
+}
+
+.bonus-title {
+  margin: 0 4px;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.bonus-row {
+  width: 100%;
+  font: inherit;
+  text-align: left;
+  background: none;
+  border: 0;
+}
+
+.select-dot {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  font-size: 14px;
+  color: transparent;
+  border: 2px solid var(--fill-strong);
+  border-radius: 50%;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease;
+
+  .selected & {
+    color: #ffffff;
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+}
+
 .finish-badge {
   display: grid;
   place-items: center;

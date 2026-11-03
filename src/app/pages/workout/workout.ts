@@ -5,15 +5,21 @@ import { ExerciseDetails } from '../../components/exercise-details';
 import { Icon } from '../../components/icon';
 import { Stepper } from '../../components/stepper';
 import { exercise } from '../../data/exercises';
-import { PROGRAM } from '../../data/program';
+import { PROGRAM, stepsOf } from '../../data/program';
 import { alertUser, keepScreenOn } from '../../device';
 import { describeStep, formatClock, formatDuration, minutesBetween } from '../../format';
-import { BLOCK_LABELS, SetLog } from '../../models';
+import { BLOCK_LABELS, SetLog, Step } from '../../models';
 import { WorkoutStore } from '../../workout-store';
 
 const secondsLeft = (endsAt: number, now: number) => Math.max(0, Math.ceil((endsAt - now) / 1000));
 const TIMER_CIRCUMFERENCE = 2 * Math.PI * 88;
 const REST_CIRCUMFERENCE = 2 * Math.PI * 20;
+
+/** Durée approximative d'une étape : ~40 s par série de reps, les repos et une minute d'installation. */
+function estimateMinutes(step: Step): number {
+  const work = step.durationSec ?? 40;
+  return Math.round((step.sets * (work + step.restSec) + 60) / 60);
+}
 
 @Component({
   selector: 'app-workout',
@@ -30,16 +36,20 @@ export class Workout {
     const log = this.log();
     return log ? PROGRAM[log.templateId] : null;
   });
+  protected readonly steps = computed(() => {
+    const log = this.log();
+    return log ? stepsOf(log) : [];
+  });
   protected readonly cursor = computed(() => this.log()?.cursor ?? 0);
-  protected readonly isLastStep = computed(() => this.cursor() + 1 === this.template()?.steps.length);
-  protected readonly step = computed(() => this.template()?.steps[this.cursor()]);
+  protected readonly isLastStep = computed(() => this.cursor() + 1 === this.steps().length);
+  protected readonly step = computed(() => this.steps()[this.cursor()]);
   protected readonly entry = computed(() => this.log()?.entries[this.cursor()]);
   protected readonly exercise = computed(() => {
     const step = this.step();
     return step ? exercise(step.exerciseId) : undefined;
   });
   protected readonly nextExercise = computed(() => {
-    const next = this.template()?.steps[this.cursor() + 1];
+    const next = this.steps()[this.cursor() + 1];
     return next ? exercise(next.exerciseId) : undefined;
   });
   protected readonly suggestion = computed(() => {
@@ -81,12 +91,32 @@ export class Workout {
     () => this.log()?.entries.reduce((n, e) => n + e.sets.filter((s) => s.done).length, 0) ?? 0,
   );
   protected readonly doneExercises = computed(
-    () => this.log()?.entries.filter((e) => e.block === 'strength' && e.sets.some((s) => s.done)).length ?? 0,
+    () =>
+      this.log()?.entries.filter(
+        (e) => (e.block === 'strength' || e.block === 'bonus') && e.exerciseId !== 'treadmill' && e.sets.some((s) => s.done),
+      ).length ?? 0,
   );
   protected readonly elapsedMin = computed(() => {
     const log = this.log();
     return log ? minutesBetween(log.startedAt, new Date(this.now()).toISOString()) : 0;
   });
+
+  /** Bonus proposés en fin de séance, sauf ceux déjà ajoutés. */
+  protected readonly bonusOptions = computed(() => {
+    const log = this.log();
+    const template = this.template();
+    if (!log || !template) return [];
+    const added = new Set((log.extraSteps ?? []).map((s) => s.exerciseId));
+    return template.bonus
+      .filter((step) => !added.has(step.exerciseId))
+      .map((step) => ({ step, exercise: exercise(step.exerciseId), minutes: estimateMinutes(step) }));
+  });
+  protected readonly selectedBonus = signal<ReadonlySet<string>>(new Set());
+  protected readonly selectedMinutes = computed(() =>
+    this.bonusOptions()
+      .filter((o) => this.selectedBonus().has(o.step.exerciseId))
+      .reduce((total, o) => total + o.minutes, 0),
+  );
 
   protected readonly timerCircumference = TIMER_CIRCUMFERENCE;
   protected readonly restCircumference = REST_CIRCUMFERENCE;
@@ -155,6 +185,25 @@ export class Workout {
   protected goTo(index: number): void {
     this.resetTimer();
     this.store.setCursor(index);
+    window.scrollTo({ top: 0 });
+  }
+
+  protected toggleBonus(exerciseId: string): void {
+    this.selectedBonus.update((selected) => {
+      const next = new Set(selected);
+      if (next.has(exerciseId)) next.delete(exerciseId);
+      else next.add(exerciseId);
+      return next;
+    });
+  }
+
+  protected addBonus(): void {
+    const steps = this.bonusOptions()
+      .filter((o) => this.selectedBonus().has(o.step.exerciseId))
+      .map((o) => o.step);
+    if (!steps.length) return;
+    this.selectedBonus.set(new Set());
+    this.store.addBonus(steps);
     window.scrollTo({ top: 0 });
   }
 

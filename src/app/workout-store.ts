@@ -1,6 +1,6 @@
 import { computed, effect, Injectable, signal } from '@angular/core';
 import { exercise } from './data/exercises';
-import { PROGRAM } from './data/program';
+import { PROGRAM, stepsOf } from './data/program';
 import { EntryLog, SetLog, Step, TemplateId, WorkoutLog } from './models';
 import { suggest, Suggestion } from './progression';
 
@@ -18,7 +18,7 @@ function read<T>(key: string, fallback: T): T {
 
 /** Une séance commencée avec une ancienne version du programme ne peut pas être reprise. */
 function matchesProgram(log: WorkoutLog | null): WorkoutLog | null {
-  const steps = log ? PROGRAM[log.templateId]?.steps : undefined;
+  const steps = log && PROGRAM[log.templateId] ? stepsOf(log) : undefined;
   const matches =
     !!steps &&
     log!.entries.length === steps.length &&
@@ -56,21 +56,7 @@ export class WorkoutStore {
   }
 
   start(templateId: TemplateId): void {
-    const entries = PROGRAM[templateId].steps.map((step): EntryLog => {
-      const s = this.suggest(step);
-      return {
-        exerciseId: step.exerciseId,
-        block: step.block,
-        sets: Array.from({ length: step.sets }, () => ({
-          weight: s.weight,
-          reps: s.reps,
-          durationSec: s.durationSec,
-          speed: s.speed,
-          incline: s.incline,
-          done: false,
-        })),
-      };
-    });
+    const entries = PROGRAM[templateId].steps.map((step) => this.newEntry(step));
     this.currentSignal.set({
       id: crypto.randomUUID(),
       templateId,
@@ -78,6 +64,19 @@ export class WorkoutStore {
       cursor: 0,
       entries,
     });
+  }
+
+  /** Ajoute des exercices bonus à la fin de la séance et y place le curseur. */
+  addBonus(steps: Step[]): void {
+    this.currentSignal.update(
+      (log) =>
+        log && {
+          ...log,
+          cursor: log.entries.length,
+          extraSteps: [...(log.extraSteps ?? []), ...steps],
+          entries: [...log.entries, ...steps.map((step) => this.newEntry(step))],
+        },
+    );
   }
 
   updateSet(entryIndex: number, setIndex: number, patch: Partial<SetLog>): void {
@@ -107,6 +106,23 @@ export class WorkoutStore {
 
   abandon(): void {
     this.currentSignal.set(null);
+  }
+
+  /** Séries pré-remplies avec la suggestion de progression. */
+  private newEntry(step: Step): EntryLog {
+    const s = this.suggest(step);
+    return {
+      exerciseId: step.exerciseId,
+      block: step.block,
+      sets: Array.from({ length: step.sets }, () => ({
+        weight: s.weight,
+        reps: s.reps,
+        durationSec: s.durationSec,
+        speed: s.speed,
+        incline: s.incline,
+        done: false,
+      })),
+    };
   }
 
   private lastEntry(step: Step): EntryLog | undefined {

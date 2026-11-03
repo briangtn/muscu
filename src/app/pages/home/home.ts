@@ -2,7 +2,7 @@ import { Component, computed, inject } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { Icon } from '../../components/icon';
 import { exercise } from '../../data/exercises';
-import { PROGRAM } from '../../data/program';
+import { PROGRAM, stepsOf } from '../../data/program';
 import { describeStep, formatDuration, formatKg, formatSpeed } from '../../format';
 import { BLOCK_LABELS, BlockId, SessionTemplate, Step } from '../../models';
 import { WorkoutStore } from '../../workout-store';
@@ -40,10 +40,13 @@ export class Home {
     const current = this.store.current();
     return current ? PROGRAM[current.templateId] : null;
   });
-  protected readonly currentProgress = computed(() => {
-    const template = this.currentTemplate();
-    return template ? (this.store.current()!.cursor / template.steps.length) * 100 : 0;
+  protected readonly currentSteps = computed(() => {
+    const current = this.store.current();
+    return current ? stepsOf(current).length : 0;
   });
+  protected readonly currentProgress = computed(() =>
+    this.currentSteps() ? (this.store.current()!.cursor / this.currentSteps()) * 100 : 0,
+  );
   protected readonly strengthCount = computed(() => this.next().steps.filter((s) => s.block === 'strength').length);
   protected readonly blocks = computed(() => this.summarize(this.next()));
   protected readonly thisWeek = computed(() => {
@@ -68,8 +71,10 @@ export class Home {
   private summarize(template: SessionTemplate): BlockSummary[] {
     const byBlock = new Map<BlockId, Step[]>();
     for (const step of template.steps) byBlock.set(step.block, [...(byBlock.get(step.block) ?? []), step]);
-    return [...byBlock].map(([block, steps]) => ({
-      label: BLOCK_LABELS[block],
+    const blocks = [...byBlock].map(([block, steps]) => ({ label: BLOCK_LABELS[block], steps }));
+    blocks.push({ label: 'Bonus, si tu as la forme', steps: template.bonus });
+    return blocks.map(({ label, steps }) => ({
+      label,
       lines: steps.map((step) => {
         const ex = exercise(step.exerciseId);
         const s = this.store.suggest(step);

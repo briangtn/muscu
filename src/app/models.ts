@@ -1,5 +1,5 @@
 export type ExerciseKind = 'weighted' | 'bodyweight' | 'timed';
-export type BlockId = 'warmup' | 'mobility' | 'strength' | 'cardio';
+export type BlockId = 'warmup' | 'mobility' | 'strength' | 'cardio' | 'bonus';
 export type TemplateId = 'A' | 'B';
 export type MuscleId =
   | 'chest'
@@ -55,6 +55,8 @@ export interface SessionTemplate {
   name: string;
   focus: string;
   steps: Step[];
+  /** Exercices proposés en fin de séance quand on a encore de l'énergie. */
+  bonus: Step[];
 }
 
 export interface SetLog {
@@ -81,6 +83,8 @@ export interface WorkoutLog {
   /** Index de l'étape en cours, pour reprendre une séance interrompue. */
   cursor: number;
   entries: EntryLog[];
+  /** Exercices bonus ajoutés en fin de séance, à la suite des étapes du programme. */
+  extraSteps?: Step[];
 }
 
 export const MUSCLE_LABELS: Record<MuscleId, string> = {
@@ -106,4 +110,5 @@ export const BLOCK_LABELS: Record<BlockId, string> = {
   mobility: 'Mobilité',
   strength: 'Musculation',
   cardio: 'Cardio',
+  bonus: 'Bonus',
 };
