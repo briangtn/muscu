@@ -72,6 +72,7 @@ export const EXERCISE_LIST: Exercise[] = [
     kind: 'weighted',
     muscles: { primary: ['quads', 'glutes'], secondary: ['hamstrings'] },
     increment: 5,
+    startWeight: 40,
     equipment: 'Machine',
     images: frames('Leg_Press'),
     cues: [
@@ -91,6 +92,7 @@ export const EXERCISE_LIST: Exercise[] = [
     kind: 'weighted',
     muscles: { primary: ['lats'], secondary: ['biceps', 'traps'] },
     increment: 2.5,
+    startWeight: 30,
     equipment: 'Poulie haute',
     images: frames('Wide-Grip_Lat_Pulldown'),
     cues: [
@@ -122,6 +124,7 @@ export const EXERCISE_LIST: Exercise[] = [
     kind: 'weighted',
     muscles: { primary: ['quads', 'glutes'], secondary: ['abs', 'lowerBack'] },
     increment: 2,
+    startWeight: 10,
     equipment: 'Haltère ou kettlebell',
     images: frames('Goblet_Squat'),
     cues: [
@@ -138,6 +141,7 @@ export const EXERCISE_LIST: Exercise[] = [
     kind: 'weighted',
     muscles: { primary: ['lats', 'traps'], secondary: ['biceps', 'shoulders'] },
     increment: 2.5,
+    startWeight: 30,
     equipment: 'Poulie basse',
     images: frames('Seated_Cable_Rows'),
     cues: [
@@ -154,6 +158,7 @@ export const EXERCISE_LIST: Exercise[] = [
     kind: 'weighted',
     muscles: { primary: ['biceps'], secondary: ['forearms'] },
     increment: 2.5,
+    startWeight: 10,
     equipment: 'Poulie basse',
     images: frames('Standing_Biceps_Cable_Curl'),
     cues: [
@@ -170,6 +175,7 @@ export const EXERCISE_LIST: Exercise[] = [
     kind: 'weighted',
     muscles: { primary: ['triceps'], secondary: [] },
     increment: 2.5,
+    startWeight: 15,
     equipment: 'Poulie haute',
     images: frames('Triceps_Pushdown'),
     cues: [
@@ -186,6 +192,8 @@ export const EXERCISE_LIST: Exercise[] = [
     kind: 'weighted',
     muscles: { primary: ['chest'], secondary: ['shoulders', 'triceps'] },
     increment: 2,
+    startWeight: 8,
+    perDumbbell: true,
     equipment: 'Haltères + banc plat',
     images: frames('Dumbbell_Bench_Press'),
     cues: [
@@ -202,6 +210,8 @@ export const EXERCISE_LIST: Exercise[] = [
     kind: 'weighted',
     muscles: { primary: ['chest'], secondary: ['shoulders', 'triceps'] },
     increment: 2,
+    startWeight: 6,
+    perDumbbell: true,
     equipment: 'Haltères + banc incliné',
     images: frames('Incline_Dumbbell_Press'),
     cues: [
@@ -218,6 +228,8 @@ export const EXERCISE_LIST: Exercise[] = [
     kind: 'weighted',
     muscles: { primary: ['shoulders'], secondary: ['triceps', 'traps'] },
     increment: 2,
+    startWeight: 6,
+    perDumbbell: true,
     equipment: 'Haltères + banc à dossier droit',
     images: frames('Dumbbell_Shoulder_Press'),
     cues: [
@@ -234,6 +246,7 @@ export const EXERCISE_LIST: Exercise[] = [
     kind: 'weighted',
     muscles: { primary: ['hamstrings'], secondary: ['calves'] },
     increment: 2.5,
+    startWeight: 20,
     equipment: 'Machine',
     images: frames('Seated_Leg_Curl'),
     cues: [
@@ -250,6 +263,8 @@ export const EXERCISE_LIST: Exercise[] = [
     kind: 'weighted',
     muscles: { primary: ['hamstrings', 'glutes'], secondary: ['lowerBack', 'forearms'] },
     increment: 2,
+    startWeight: 8,
+    perDumbbell: true,
     equipment: 'Haltères',
     images: frames('Stiff-Legged_Dumbbell_Deadlift'),
     cues: [
@@ -266,6 +281,8 @@ export const EXERCISE_LIST: Exercise[] = [
     kind: 'weighted',
     muscles: { primary: ['shoulders'], secondary: ['traps'] },
     increment: 1,
+    startWeight: 3,
+    perDumbbell: true,
     equipment: 'Haltères',
     images: frames('Side_Lateral_Raise'),
     cues: [
@@ -297,6 +314,7 @@ export const EXERCISE_LIST: Exercise[] = [
     kind: 'weighted',
     muscles: { primary: ['triceps'], secondary: [] },
     increment: 2.5,
+    startWeight: 10,
     equipment: 'Poulie + corde',
     images: frames('Cable_Rope_Overhead_Triceps_Extension'),
     cues: [
@@ -313,6 +331,7 @@ export const EXERCISE_LIST: Exercise[] = [
     kind: 'weighted',
     muscles: { primary: ['shoulders', 'traps'], secondary: ['biceps'] },
     increment: 2.5,
+    startWeight: 10,
     equipment: 'Poulie haute + corde',
     images: frames('Face_Pull'),
     cues: [
@@ -329,6 +348,7 @@ export const EXERCISE_LIST: Exercise[] = [
     kind: 'weighted',
     muscles: { primary: ['quads'], secondary: [] },
     increment: 2.5,
+    startWeight: 20,
     equipment: 'Machine',
     images: frames('Leg_Extensions'),
     cues: [
@@ -345,6 +365,7 @@ export const EXERCISE_LIST: Exercise[] = [
     kind: 'weighted',
     muscles: { primary: ['calves'], secondary: [] },
     increment: 5,
+    startWeight: 30,
     equipment: 'Machine à mollets',
     images: frames('Standing_Calf_Raises'),
     cues: [
@@ -361,6 +382,8 @@ export const EXERCISE_LIST: Exercise[] = [
     kind: 'weighted',
     muscles: { primary: ['biceps', 'forearms'], secondary: [] },
     increment: 2,
+    startWeight: 6,
+    perDumbbell: true,
     equipment: 'Haltères',
     images: frames('Hammer_Curls'),
     cues: [
@@ -377,6 +400,7 @@ export const EXERCISE_LIST: Exercise[] = [
     kind: 'weighted',
     muscles: { primary: ['chest'], secondary: ['shoulders'] },
     increment: 2.5,
+    startWeight: 20,
     equipment: 'Machine',
     images: frames('Butterfly'),
     cues: [
@@ -393,6 +417,8 @@ export const EXERCISE_LIST: Exercise[] = [
     kind: 'weighted',
     muscles: { primary: ['quads', 'glutes'], secondary: ['hamstrings', 'calves'] },
     increment: 2,
+    startWeight: 4,
+    perDumbbell: true,
     perSide: true,
     equipment: 'Haltères',
     images: frames('Dumbbell_Lunges'),

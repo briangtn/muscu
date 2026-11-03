@@ -41,14 +41,19 @@ export function suggest(step: Step, exercise: Exercise, last: EntryLog | undefin
   const done = (last?.sets ?? []).filter((s) => s.done && s.reps !== null);
 
   if (done.length === 0) {
+    const start = exercise.startWeight ?? null;
+    const perDumbbell = exercise.perDumbbell ? ' par haltère' : '';
     return {
       ...NONE,
+      weight: start,
       reps: repsMin,
       message:
-        exercise.kind === 'weighted'
-          ? `Première fois : choisis une charge avec laquelle tu fais ${repsMin} reps propres en gardant 2 reps en réserve.`
-          : '',
-      progressed: false,
+        exercise.kind !== 'weighted'
+          ? ''
+          : start !== null
+            ? `Première fois : charge de départ conseillée ${formatKg(start)}${perDumbbell}. ` +
+              `Trop facile (tu pourrais dépasser ${repsMax} reps) ? Monte d'un palier. Trop dur ? Descends.`
+            : `Première fois : choisis une charge avec laquelle tu fais ${repsMin} reps propres en gardant 2 reps en réserve.`,
     };
   }
 

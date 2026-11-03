@@ -30,6 +30,10 @@ export interface Exercise {
   muscles: { primary: MuscleId[]; secondary: MuscleId[] };
   /** Palier d'augmentation de charge en kg. */
   increment?: number;
+  /** Charge conseillée pour la toute première séance d'un débutant, en kg. */
+  startWeight?: number;
+  /** La charge s'entend par haltère (il en faut deux). */
+  perDumbbell?: boolean;
   /** Les reps ou la durée se comptent par côté. */
   perSide?: boolean;
   /** On note la vitesse et la pente (tapis de course). */

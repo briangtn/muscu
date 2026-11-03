@@ -83,7 +83,7 @@ export class Home {
           return { ...line, spec: `${formatDuration(step.durationSec ?? 0)} · ${formatSpeed(s.speed)} · pente ${s.incline} %` };
         }
         if (ex.kind === 'weighted') {
-          const load = s.weight !== null ? formatKg(s.weight) : 'charge à définir';
+          const load = s.weight !== null ? `${formatKg(s.weight)}${ex.perDumbbell ? ' / haltère' : ''}` : 'charge à définir';
           return { ...line, spec: `${step.sets} × ${s.reps} · ${load}`, progressed: s.progressed };
         }
         return { ...line, spec: describeStep(step, ex) };

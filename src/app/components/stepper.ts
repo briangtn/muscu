@@ -37,7 +37,7 @@ import { Component, input, output } from '@angular/core';
     }
     button {
       flex: none;
-      width: 34px;
+      width: 32px;
       padding: 0;
       font-size: 24px;
       font-weight: 400;
@@ -77,6 +77,7 @@ import { Component, input, output } from '@angular/core';
     span {
       margin-top: 1px;
       font-size: 11px;
+      white-space: nowrap;
       color: var(--label-2);
     }
   `,

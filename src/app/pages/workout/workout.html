@@ -109,7 +109,7 @@
             </span>
           } @else {
             @if (ex.kind === 'weighted') {
-              <app-stepper [value]="set.weight" [step]="ex.increment ?? 1" unit="kg" [disabled]="set.done" (valueChange)="update($index, 'weight', $event)" />
+              <app-stepper [value]="set.weight" [step]="ex.increment ?? 1" [unit]="ex.perDumbbell ? 'kg/haltère' : 'kg'" [disabled]="set.done" (valueChange)="update($index, 'weight', $event)" />
             }
             <app-stepper [value]="set.reps" [step]="1" [unit]="ex.perSide ? 'reps / côté' : 'reps'" [disabled]="set.done" (valueChange)="update($index, 'reps', $event)" />
           }
