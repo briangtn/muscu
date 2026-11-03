@@ -6,7 +6,7 @@ import { Icon } from '../../components/icon';
 import { Stepper } from '../../components/stepper';
 import { exercise } from '../../data/exercises';
 import { PROGRAM, stepsOf } from '../../data/program';
-import { alertUser, keepScreenOn } from '../../device';
+import { alertUser, celebrate, keepScreenOn } from '../../device';
 import { describeStep, formatClock, formatDuration, minutesBetween } from '../../format';
 import { BLOCK_LABELS, SetLog, Step } from '../../models';
 import { entryStatus, isCountedExercise } from '../../session-report';
@@ -188,6 +188,7 @@ export class Workout {
   }
 
   protected goTo(index: number): void {
+    if (index >= this.steps().length && this.cursor() < this.steps().length) celebrate();
     this.resetTimer();
     this.store.setCursor(index);
     window.scrollTo({ top: 0 });

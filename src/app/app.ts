@@ -4,6 +4,7 @@ import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } fro
 import { filter, map } from 'rxjs';
 import { Icon } from './components/icon';
 import { EXERCISE_LIST } from './data/exercises';
+import { unlockAudioOnTouch } from './device';
 
 @Component({
   imports: [RouterOutlet, RouterLink, RouterLinkActive, Icon],
@@ -24,6 +25,7 @@ export class App {
   );
 
   constructor() {
+    unlockAudioOnTouch();
     // Une fois le service worker actif, on charge toutes les images pour qu'elles soient disponibles hors ligne à la salle.
     navigator.serviceWorker?.ready.then(() => {
       for (const url of EXERCISE_LIST.flatMap((e) => e.images)) fetch(url, { mode: 'cors' }).catch(() => undefined);
