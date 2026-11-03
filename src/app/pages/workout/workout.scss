@@ -50,7 +50,7 @@
 .segments {
   display: flex;
   gap: 3px;
-  margin: 4px 0 16px;
+  margin: 2px 0 14px;
 
   span {
     flex: 1;
@@ -70,15 +70,62 @@
   }
 }
 
-.chips {
+// En-tête compact : vignette animée + nom + objectif
+.head {
   display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 14px;
+  align-items: center;
+  gap: 14px;
+}
+
+.thumb-btn {
+  flex: none;
+  width: 112px;
+  padding: 0;
+  background: none;
+  border: 0;
+}
+
+.head-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.ex-name {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.15;
+}
+
+.target {
+  margin: 4px 0 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.how-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  margin-top: 4px;
+  padding: 0;
+  font-size: 15px;
+  color: var(--accent);
+  background: none;
+  border: 0;
+
+  app-icon {
+    font-size: 12px;
+  }
+}
+
+.details-title {
+  margin-top: 40px;
+  scroll-margin-top: calc(env(safe-area-inset-top) + 90px);
 }
 
 .note {
-  margin: 12px 4px 0;
+  margin: 10px 4px 0;
   font-size: 15px;
   color: var(--label-2);
 }
@@ -86,8 +133,8 @@
 .tip {
   display: flex;
   gap: 10px;
-  margin-top: 12px;
-  padding: 12px 14px;
+  margin-top: 10px;
+  padding: 10px 14px;
   font-size: 15px;
   background: var(--card);
   border-radius: var(--radius);
@@ -114,10 +161,14 @@
   }
 }
 
-// Minuteur circulaire façon app Horloge
+// Minuteur circulaire encadré par les boutons, façon app Horloge
 .timer {
-  margin-top: 20px;
-  padding: 20px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 12px;
+  padding: 14px 12px;
   background: var(--card);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow);
@@ -125,8 +176,8 @@
 
 .timer-ring {
   position: relative;
-  width: min(240px, 70vw);
-  margin: 0 auto;
+  flex: 1;
+  max-width: 180px;
   aspect-ratio: 1;
 
   svg {
@@ -161,21 +212,16 @@
 }
 
 .timer-time {
-  font-size: 54px;
+  font-size: 40px;
   font-weight: 300;
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.02em;
 }
 
-.clock-buttons {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 16px;
-}
-
 .round {
-  width: 82px;
-  height: 82px;
+  flex: none;
+  width: 68px;
+  height: 68px;
   padding: 0;
   font-size: 15px;
   font-weight: 500;
@@ -211,7 +257,8 @@
 
 // Séries
 .sets {
-  padding: 4px 0;
+  margin-top: 12px;
+  padding: 2px 0;
 }
 
 .set-row {
@@ -219,7 +266,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 12px;
+  padding: 6px 12px;
   transition: background 0.2s ease;
 
   & + &::before {

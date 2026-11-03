@@ -21,101 +21,112 @@
 
   @if (step(); as s) {
     @let ex = exercise()!;
-    <app-exercise-guide [exercise]="ex">
-      <div class="chips">
-        <span class="pill">{{ describeStep(s, ex) }}</span>
-        @if (s.restSec) {
-          <span class="pill"><app-icon name="timer" /> Repos {{ formatDuration(s.restSec) }}</span>
-        }
+    <!-- Partie opérationnelle : tient dans l'écran sans scroller -->
+    <section class="head">
+      <button class="thumb-btn" (click)="showDetails()" aria-label="Voir comment faire l'exercice">
+        <app-exercise-animation [images]="ex.images" [alt]="ex.name" [compact]="true" />
+      </button>
+      <div class="head-text">
+        <h1 class="ex-name">{{ ex.name }}</h1>
+        <p class="target">
+          {{ describeStep(s, ex) }}
+          @if (s.restSec) {
+            <span class="muted"> · repos {{ formatDuration(s.restSec) }}</span>
+          }
+        </p>
+        <button class="how-link" (click)="showDetails()">Comment faire <app-icon name="chevronRight" /></button>
       </div>
-      @if (s.note) {
-        <p class="note">{{ s.note }}</p>
-      }
-      @if (suggestion()?.message; as message) {
-        <div class="tip" [class.progressed]="suggestion()!.progressed">
-          <app-icon [name]="suggestion()!.progressed ? 'arrowUp' : 'info'" />
-          <p>{{ message }}</p>
+    </section>
+
+    @if (s.note) {
+      <p class="note">{{ s.note }}</p>
+    }
+    @if (suggestion()?.message; as message) {
+      <div class="tip" [class.progressed]="suggestion()!.progressed">
+        <app-icon [name]="suggestion()!.progressed ? 'arrowUp' : 'info'" />
+        <p>{{ message }}</p>
+      </div>
+    }
+
+    @if (ex.kind === 'timed') {
+      <section class="timer">
+        <button class="round gray" (click)="completeTimedSet()" [disabled]="activeSet() < 0">Terminé</button>
+        <div class="timer-ring">
+          <svg viewBox="0 0 200 200" aria-hidden="true">
+            <defs>
+              <linearGradient id="timer-gradient" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="#ff2d55" />
+                <stop offset="1" stop-color="#ff9500" />
+              </linearGradient>
+            </defs>
+            <circle class="track" cx="100" cy="100" r="88" />
+            <circle
+              class="value"
+              cx="100"
+              cy="100"
+              r="88"
+              [attr.stroke-dasharray]="timerCircumference"
+              [style.stroke-dashoffset.px]="timerOffset()"
+            />
+          </svg>
+          <div class="timer-label">
+            <span class="timer-time">{{ formatClock(timerLeft()) }}</span>
+            <span class="muted footnote">sur {{ formatDuration(s.durationSec ?? 0) }}</span>
+          </div>
         </div>
-      }
+        @if (timerEndsAt() !== null) {
+          <button class="round orange" (click)="pauseTimer()">Pause</button>
+        } @else {
+          <button class="round green" (click)="startTimer()" [disabled]="activeSet() < 0">
+            {{ timerPaused() ? 'Reprendre' : 'Démarrer' }}
+          </button>
+        }
+      </section>
+    }
 
-      @if (ex.kind === 'timed') {
-        <section class="timer">
-          <div class="timer-ring">
-            <svg viewBox="0 0 200 200" aria-hidden="true">
-              <defs>
-                <linearGradient id="timer-gradient" x1="0" y1="0" x2="1" y2="1">
-                  <stop offset="0" stop-color="#ff2d55" />
-                  <stop offset="1" stop-color="#ff9500" />
-                </linearGradient>
-              </defs>
-              <circle class="track" cx="100" cy="100" r="88" />
-              <circle
-                class="value"
-                cx="100"
-                cy="100"
-                r="88"
-                [attr.stroke-dasharray]="timerCircumference"
-                [style.stroke-dashoffset.px]="timerOffset()"
-              />
-            </svg>
-            <div class="timer-label">
-              <span class="timer-time">{{ formatClock(timerLeft()) }}</span>
-              <span class="muted footnote">sur {{ formatDuration(s.durationSec ?? 0) }}</span>
-            </div>
-          </div>
-          <div class="clock-buttons">
-            <button class="round gray" (click)="completeTimedSet()" [disabled]="activeSet() < 0">Terminé</button>
-            @if (timerEndsAt() !== null) {
-              <button class="round orange" (click)="pauseTimer()">Pause</button>
+    <div class="list sets">
+      @for (set of entry()!.sets; track $index) {
+        <div class="set-row" [class.done]="set.done" [class.active]="$index === activeSet()">
+          <span class="badge">
+            @if (set.done) {
+              <app-icon name="check" />
             } @else {
-              <button class="round green" (click)="startTimer()" [disabled]="activeSet() < 0">
-                {{ timerPaused() ? 'Reprendre' : 'Démarrer' }}
-              </button>
+              {{ $index + 1 }}
             }
-          </div>
-        </section>
-      }
-
-      <p class="list-header">Séries</p>
-      <div class="list sets">
-        @for (set of entry()!.sets; track $index) {
-          <div class="set-row" [class.done]="set.done" [class.active]="$index === activeSet()">
-            <span class="badge">
+          </span>
+          @if (ex.tracksSpeed) {
+            <app-stepper [value]="set.speed" [step]="0.5" unit="km/h" [disabled]="set.done" (valueChange)="update($index, 'speed', $event)" />
+            <app-stepper [value]="set.incline" [step]="1" unit="% pente" [disabled]="set.done" (valueChange)="update($index, 'incline', $event)" />
+          } @else if (ex.kind === 'timed') {
+            <span class="set-label">
               @if (set.done) {
-                <app-icon name="check" />
+                {{ formatClock(set.durationSec ?? 0) }} réalisées
               } @else {
-                {{ $index + 1 }}
+                {{ setLabel($index, s.durationSec ?? 0, !!ex.perSide) }}
               }
             </span>
-            @if (ex.tracksSpeed) {
-              <app-stepper [value]="set.speed" [step]="0.5" unit="km/h" [disabled]="set.done" (valueChange)="update($index, 'speed', $event)" />
-              <app-stepper [value]="set.incline" [step]="1" unit="% pente" [disabled]="set.done" (valueChange)="update($index, 'incline', $event)" />
-            } @else if (ex.kind === 'timed') {
-              <span class="set-label">
-                @if (set.done) {
-                  {{ formatClock(set.durationSec ?? 0) }} réalisées
-                } @else {
-                  {{ setLabel($index, s.durationSec ?? 0, !!ex.perSide) }}
-                }
-              </span>
-            } @else {
-              @if (ex.kind === 'weighted') {
-                <app-stepper [value]="set.weight" [step]="ex.increment ?? 1" unit="kg" [disabled]="set.done" (valueChange)="update($index, 'weight', $event)" />
-              }
-              <app-stepper [value]="set.reps" [step]="1" [unit]="ex.perSide ? 'reps / côté' : 'reps'" [disabled]="set.done" (valueChange)="update($index, 'reps', $event)" />
+          } @else {
+            @if (ex.kind === 'weighted') {
+              <app-stepper [value]="set.weight" [step]="ex.increment ?? 1" unit="kg" [disabled]="set.done" (valueChange)="update($index, 'weight', $event)" />
             }
-            @if (ex.kind !== 'timed' || set.done) {
-              <button class="check" [class.done]="set.done" (click)="toggleSet($index)" [attr.aria-label]="set.done ? 'Annuler la série' : 'Valider la série'">
-                <app-icon name="check" />
-              </button>
-            }
-          </div>
-        }
-      </div>
-      @if (nextExercise(); as next) {
-        <p class="up-next">Ensuite · <strong>{{ next.name }}</strong></p>
+            <app-stepper [value]="set.reps" [step]="1" [unit]="ex.perSide ? 'reps / côté' : 'reps'" [disabled]="set.done" (valueChange)="update($index, 'reps', $event)" />
+          }
+          @if (ex.kind !== 'timed' || set.done) {
+            <button class="check" [class.done]="set.done" (click)="toggleSet($index)" [attr.aria-label]="set.done ? 'Annuler la série' : 'Valider la série'">
+              <app-icon name="check" />
+            </button>
+          }
+        </div>
       }
-    </app-exercise-guide>
+    </div>
+    @if (nextExercise(); as next) {
+      <p class="up-next">Ensuite · <strong>{{ next.name }}</strong></p>
+    }
+
+    <!-- Détail de l'exercice, accessible en scrollant -->
+    <h2 class="section-title details-title" id="details">Comment faire</h2>
+    <app-exercise-animation [images]="ex.images" [alt]="ex.name" />
+    <app-exercise-details [exercise]="ex" />
   } @else {
     <section class="finish">
       <div class="finish-badge"><app-icon name="check" /></div>

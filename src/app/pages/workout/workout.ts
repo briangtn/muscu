@@ -1,6 +1,7 @@
 import { Component, computed, DestroyRef, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
-import { ExerciseGuide } from '../../components/exercise-guide';
+import { ExerciseAnimation } from '../../components/exercise-animation';
+import { ExerciseDetails } from '../../components/exercise-details';
 import { Icon } from '../../components/icon';
 import { Stepper } from '../../components/stepper';
 import { exercise } from '../../data/exercises';
@@ -16,7 +17,7 @@ const REST_CIRCUMFERENCE = 2 * Math.PI * 20;
 
 @Component({
   selector: 'app-workout',
-  imports: [ExerciseGuide, Icon, RouterLink, Stepper],
+  imports: [ExerciseAnimation, ExerciseDetails, Icon, RouterLink, Stepper],
   templateUrl: './workout.html',
   styleUrl: './workout.scss',
 })
@@ -160,6 +161,10 @@ export class Workout {
   protected finish(): void {
     this.store.finish();
     this.router.navigate(['/']);
+  }
+
+  protected showDetails(): void {
+    document.getElementById('details')?.scrollIntoView({ behavior: 'smooth' });
   }
 
   protected setLabel(setIndex: number, durationSec: number, perSide: boolean): string {

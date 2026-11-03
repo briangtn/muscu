@@ -5,6 +5,7 @@ import { Icon } from './icon';
 @Component({
   selector: 'app-exercise-animation',
   imports: [Icon],
+  host: { '[class.compact]': 'compact()' },
   template: `
     @if (images().length) {
       <div class="frames">
@@ -81,11 +82,24 @@ import { Icon } from './icon';
       font-size: 40px;
       color: var(--label-3);
     }
+    /* Vignette dans l'en-tête de séance */
+    :host(.compact) .frames {
+      border-radius: 12px;
+      box-shadow: none;
+    }
+    :host(.compact) .dots,
+    :host(.compact) .placeholder span {
+      display: none;
+    }
+    :host(.compact) .placeholder app-icon {
+      font-size: 28px;
+    }
   `,
 })
 export class ExerciseAnimation {
   readonly images = input.required<string[]>();
   readonly alt = input('');
+  readonly compact = input(false);
   protected readonly frame = signal(0);
 
   constructor() {
