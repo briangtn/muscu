@@ -1,0 +1,45 @@
+.app {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 0 16px calc(32px + env(safe-area-inset-bottom));
+
+  &.has-tabs {
+    padding-bottom: calc(100px + env(safe-area-inset-bottom));
+  }
+}
+
+.tab-bar {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 10;
+  display: flex;
+  justify-content: center;
+  padding: 7px 8px calc(4px + env(safe-area-inset-bottom));
+  background: var(--bar);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  border-top: 0.5px solid var(--separator);
+
+  a {
+    flex: 1;
+    max-width: 160px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    padding: 2px 0 4px;
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--label-2);
+
+    &.active {
+      color: var(--accent);
+    }
+  }
+
+  app-icon {
+    font-size: 25px;
+  }
+}

@@ -1,0 +1,20 @@
+<main class="app" [class.has-tabs]="showTabs()">
+  <router-outlet />
+</main>
+
+@if (showTabs()) {
+  <nav class="tab-bar">
+    <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+      <app-icon name="home" />
+      <span>Aujourd'hui</span>
+    </a>
+    <a routerLink="/exercices" routerLinkActive="active">
+      <app-icon name="dumbbell" />
+      <span>Exercices</span>
+    </a>
+    <a routerLink="/historique" routerLinkActive="active">
+      <app-icon name="clock" />
+      <span>Historique</span>
+    </a>
+  </nav>
+}

@@ -1,0 +1,148 @@
+.hero {
+  position: relative;
+  margin-top: 8px;
+  padding: 20px;
+  color: #ffffff;
+  background: var(--gradient);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 14px 34px rgb(255 45 85 / 0.28);
+  overflow: hidden;
+
+  // Halo lumineux discret en haut à droite
+  &::after {
+    content: '';
+    position: absolute;
+    top: -60px;
+    right: -60px;
+    width: 180px;
+    height: 180px;
+    background: radial-gradient(circle, rgb(255 255 255 / 0.28), transparent 70%);
+    pointer-events: none;
+  }
+
+  .btn {
+    margin-top: 18px;
+  }
+}
+
+.hero-eyebrow {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  opacity: 0.85;
+}
+
+.hero-title {
+  margin: 4px 0 4px;
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.hero-sub {
+  margin: 0;
+  font-size: 16px;
+  opacity: 0.9;
+}
+
+.hero-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.hero-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  font-size: 14px;
+  font-weight: 600;
+  background: rgb(255 255 255 / 0.2);
+  border-radius: 999px;
+}
+
+.hero-progress {
+  height: 6px;
+  margin-top: 14px;
+  background: rgb(255 255 255 / 0.25);
+  border-radius: 3px;
+  overflow: hidden;
+
+  div {
+    height: 100%;
+    background: #ffffff;
+    border-radius: 3px;
+  }
+}
+
+.hero-link {
+  display: block;
+  width: 100%;
+  margin-top: 8px;
+  padding: 8px;
+  font-size: 15px;
+  color: #ffffff;
+  background: none;
+  border: 0;
+  opacity: 0.85;
+}
+
+.activity {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 12px;
+
+  p {
+    margin: 0;
+  }
+}
+
+.ring {
+  flex: none;
+  width: 64px;
+  height: 64px;
+  transform: rotate(-90deg);
+
+  circle {
+    fill: none;
+    stroke-width: 9;
+  }
+
+  .track {
+    stroke: var(--accent-soft);
+  }
+
+  .value {
+    stroke: url(#ring-gradient);
+    stroke-linecap: round;
+    transition: stroke-dashoffset 0.6s ease;
+  }
+}
+
+.activity-value {
+  margin: 2px 0;
+  font-size: 28px;
+  font-weight: 700;
+
+  span {
+    font-size: 17px;
+    font-weight: 500;
+    color: var(--label-2);
+  }
+}
+
+.subtitle {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+
+  &.progressed {
+    color: var(--green);
+    font-weight: 600;
+  }
+}

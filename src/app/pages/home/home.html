@@ -1,0 +1,93 @@
+<header class="page-header">
+  <p class="eyebrow">{{ today }}</p>
+  <h1 class="large-title">Aujourd'hui</h1>
+</header>
+
+@if (currentTemplate(); as template) {
+  <section class="hero">
+    <p class="hero-eyebrow">Séance en cours</p>
+    <h2 class="hero-title">{{ template.name }}</h2>
+    <p class="hero-sub">
+      @if (store.current()!.cursor < template.steps.length) {
+        Étape {{ store.current()!.cursor + 1 }} sur {{ template.steps.length }}
+      } @else {
+        Terminée, il ne reste qu'à l'enregistrer
+      }
+    </p>
+    <div class="hero-progress"><div [style.width.%]="currentProgress()"></div></div>
+    <a class="btn btn-white btn-block" routerLink="/seance">
+      <app-icon name="play" />
+      Reprendre
+    </a>
+    <button class="hero-link" (click)="abandon()">Abandonner la séance</button>
+  </section>
+} @else {
+  <section class="hero">
+    <p class="hero-eyebrow">Prochaine séance</p>
+    <h2 class="hero-title">{{ next().name }}</h2>
+    <p class="hero-sub">{{ next().focus }}</p>
+    <div class="hero-meta">
+      <span class="hero-chip"><app-icon name="clock" /> ≈ 60 min</span>
+      <span class="hero-chip"><app-icon name="dumbbell" /> {{ strengthCount() }} exercices</span>
+    </div>
+    <button class="btn btn-white btn-block" (click)="start()">
+      <app-icon name="play" />
+      Commencer
+    </button>
+  </section>
+}
+
+<section class="card activity">
+  <svg class="ring" viewBox="0 0 64 64" aria-hidden="true">
+    <defs>
+      <linearGradient id="ring-gradient" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#ff2d55" />
+        <stop offset="1" stop-color="#ff9500" />
+      </linearGradient>
+    </defs>
+    <circle class="track" cx="32" cy="32" r="26" />
+    <circle
+      class="value"
+      cx="32"
+      cy="32"
+      r="26"
+      [attr.stroke-dasharray]="ringCircumference"
+      [style.stroke-dashoffset.px]="ringOffset()"
+    />
+  </svg>
+  <div>
+    <p class="eyebrow">Cette semaine</p>
+    <p class="activity-value">
+      {{ thisWeek() }}<span> / {{ weeklyGoal }} séances</span>
+    </p>
+    <p class="muted footnote">{{ store.history().length }} au total depuis le début</p>
+  </div>
+</section>
+
+@if (!currentTemplate()) {
+  <h2 class="section-title">Au programme</h2>
+  @for (block of blocks(); track block.label) {
+    <p class="list-header">{{ block.label }}</p>
+    <div class="list" style="--separator-inset: 80px">
+      @for (line of block.lines; track $index) {
+        <a class="row" [routerLink]="['/exercices', line.id]">
+          @if (line.image) {
+            <img class="thumb" [src]="line.image" alt="" crossorigin="anonymous" loading="lazy" />
+          } @else {
+            <span class="thumb thumb-empty"></span>
+          }
+          <span class="grow">
+            <span class="title">{{ line.name }}</span>
+            <span class="subtitle" [class.progressed]="line.progressed">
+              @if (line.progressed) {
+                <app-icon name="arrowUp" />
+              }
+              {{ line.spec }}
+            </span>
+          </span>
+          <app-icon class="chevron" name="chevronRight" />
+        </a>
+      }
+    </div>
+  }
+}
