@@ -11,7 +11,7 @@ const GROUPS: { label: string; muscles: MuscleId[] }[] = [
   { label: 'Abdos', muscles: ['abs', 'obliques', 'lowerBack'] },
 ];
 
-const WARMUP_IDS = new Set(['treadmill', 'cat-cow', 'hip-flexor', 'worlds-greatest']);
+const WARMUP_IDS = new Set(['treadmill-run', 'treadmill', 'cat-cow', 'hip-flexor', 'worlds-greatest']);
 
 /** Cardio et étirements d'un côté, puis les exercices de force rangés par muscle principal. */
 function groupExercises(list: Exercise[]): { label: string; exercises: Exercise[] }[] {

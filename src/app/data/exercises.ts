@@ -6,6 +6,25 @@ const frames = (id: string) => [`${IMAGE_BASE}${id}/0.jpg`, `${IMAGE_BASE}${id}/
 
 export const EXERCISE_LIST: Exercise[] = [
   {
+    id: 'treadmill-run',
+    name: 'Course sur tapis',
+    kind: 'timed',
+    tracksSpeed: true,
+    muscles: { primary: ['quads', 'calves', 'glutes'], secondary: ['hamstrings', 'hipFlexors'] },
+    equipment: 'Tapis de course',
+    images: frames('Jogging_Treadmill'),
+    cues: [
+      'Allure où tu peux encore parler par phrases courtes',
+      'Petites foulées rapides, le pied se pose sous le bassin',
+      'Buste droit, épaules relâchées, bras pliés à 90°',
+      'Pente 1 % : c’est plus proche de la course dehors',
+    ],
+    mistakes: [
+      'Allonger la foulée et attaquer par le talon : ça tape dans les genoux et le bas du dos',
+      'Se tenir aux poignées ou regarder ses pieds',
+    ],
+  },
+  {
     id: 'treadmill',
     name: 'Marche inclinée sur tapis',
     kind: 'timed',

@@ -11,7 +11,7 @@ Application web mobile (PWA) pour suivre mes séances de musculation : programme
 
 ## Fonctionnalités
 
-- **Programme full body A/B** en alternance automatique, environ 1 h : marche inclinée sur tapis, mobilité, musculation, puis cardio.
+- **Programme full body A/B** en alternance automatique, environ 1 h : footing sur tapis, mobilité, musculation, puis course.
 - **Séance guidée** : un exercice par écran avec animation, consignes clés, erreurs à éviter et schéma des muscles travaillés.
 - **Saisie rapide** des charges, reps, vitesse et pente du tapis avec des boutons − / +, pré-remplis depuis la séance précédente.
 - **Double progression** : quand toutes les séries atteignent le haut de la fourchette de reps, la charge augmente d'un palier.

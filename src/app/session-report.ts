@@ -1,4 +1,5 @@
 import { EntryLog, WorkoutLog } from './models';
+import { findExercise } from './data/exercises';
 
 /**
  * Bilan d'un exercice dans une séance :
@@ -19,5 +20,5 @@ export function entryStatus(log: WorkoutLog, index: number): EntryStatus {
 
 /** Exercices qui comptent dans le bilan : musculation et bonus, hors tapis. */
 export function isCountedExercise(entry: EntryLog): boolean {
-  return (entry.block === 'strength' || entry.block === 'bonus') && entry.exerciseId !== 'treadmill';
+  return (entry.block === 'strength' || entry.block === 'bonus') && !findExercise(entry.exerciseId)?.tracksSpeed;
 }

@@ -1,7 +1,7 @@
 import { SessionTemplate, Step, TemplateId, WorkoutLog } from '../models';
 
 const warmup: Step[] = [
-  { block: 'warmup', exerciseId: 'treadmill', sets: 1, durationSec: 8 * 60, speed: 5, incline: 4, restSec: 0, note: 'Pente 3 à 5 %, marche rapide' },
+  { block: 'warmup', exerciseId: 'treadmill-run', sets: 1, durationSec: 8 * 60, speed: 7.5, incline: 1, restSec: 0, note: 'Footing tranquille pour monter en température' },
 ];
 
 const mobility: Step[] = [
@@ -11,7 +11,7 @@ const mobility: Step[] = [
 ];
 
 const cardio: Step[] = [
-  { block: 'cardio', exerciseId: 'treadmill', sets: 1, durationSec: 10 * 60, speed: 5, incline: 10, restSec: 0, note: 'Pente 8 à 12 %, 4,5 à 5,5 km/h' },
+  { block: 'cardio', exerciseId: 'treadmill-run', sets: 1, durationSec: 10 * 60, speed: 8.5, incline: 1, restSec: 0, note: 'Allure régulière, essoufflé mais capable de parler' },
 ];
 
 const extraTreadmill: Step[] = [
