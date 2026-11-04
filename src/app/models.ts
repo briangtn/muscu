@@ -91,6 +91,8 @@ export interface WorkoutLog {
   extraSteps?: Step[];
   /** Étape à laquelle la séance a été arrêtée avant la fin ; absent si la séance est allée au bout. */
   stoppedAt?: number;
+  /** Exercices remplacés en séance (machine prise), par index d'étape. */
+  swaps?: Record<number, string>;
 }
 
 export const MUSCLE_LABELS: Record<MuscleId, string> = {

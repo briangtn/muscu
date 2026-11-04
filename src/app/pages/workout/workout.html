@@ -26,13 +26,23 @@
       }
     </div>
     <section class="head">
-      <h1 class="ex-name">{{ ex.name }}</h1>
-      <p class="target">
-        {{ describeStep(s, ex) }}
-        @if (s.restSec) {
-          <span class="muted"> · repos {{ formatDuration(s.restSec) }}</span>
+      <div class="head-text">
+        <h1 class="ex-name">{{ ex.name }}</h1>
+        <p class="target">
+          {{ describeStep(s, ex) }}
+          @if (s.restSec) {
+            <span class="muted"> · repos {{ formatDuration(s.restSec) }}</span>
+          }
+        </p>
+        @if (plannedExercise(); as planned) {
+          @if (planned.id !== ex.id) {
+            <p class="replaced">À la place de {{ planned.name }}</p>
+          }
         }
-      </p>
+      </div>
+      @if (swapOptions().length) {
+        <button class="swap" (click)="swapOpen.set(true)"><app-icon name="swap" /> Remplacer</button>
+      }
     </section>
     <!-- L'animation prend toute la place libre : grande sur un grand écran, réduite sur un petit -->
     <button class="media" (click)="showDetails()" aria-label="Voir comment faire l'exercice">
@@ -238,6 +248,16 @@
       </div>
     }
   </div>
+
+  @if (swapOpen() && step()) {
+    <app-swap-sheet
+      [options]="swapOptions()"
+      [plannedId]="plannedExercise()!.id"
+      [currentId]="step()!.exerciseId"
+      (picked)="replaceExercise($event)"
+      (closed)="swapOpen.set(false)"
+    />
+  }
 
   @if (flash()) {
     <div class="flash" aria-hidden="true"></div>

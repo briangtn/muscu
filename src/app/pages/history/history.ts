@@ -1,7 +1,7 @@
 import { Component, computed, inject } from '@angular/core';
 import { Icon, IconName } from '../../components/icon';
 import { findExercise } from '../../data/exercises';
-import { PROGRAM } from '../../data/program';
+import { plannedStepsOf, PROGRAM } from '../../data/program';
 import { formatClock, formatDate, formatKg, formatSpeed, minutesBetween } from '../../format';
 import { SetLog, WorkoutLog } from '../../models';
 import { EntryStatus, entryStatus, isCountedExercise } from '../../session-report';
@@ -49,10 +49,12 @@ function reportLine(log: WorkoutLog, index: number): ReportLine {
     skipped: 'Passé',
     notReached: 'Non fait, séance arrêtée avant',
   }[status];
+  const planned = log.swaps?.[index] ? plannedStepsOf(log)[index] : undefined;
+  const replaced = planned ? `À la place de ${findExercise(planned.exerciseId)?.name ?? planned.exerciseId} · ` : '';
   return {
     name: findExercise(entry.exerciseId)?.name ?? entry.exerciseId,
     status,
-    detail,
+    detail: replaced + detail,
     bonus: entry.block === 'bonus',
   };
 }

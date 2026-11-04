@@ -16,6 +16,7 @@ const PATHS = {
   skip: 'M5 6l9 6-9 6V6zM18 6v12',
   half: 'M12 3a9 9 0 1 0 0 18a9 9 0 1 0 0-18zM12 3v18',
   minus: 'M6 12h12',
+  swap: 'M4 8h15M15.5 4.5 19 8l-3.5 3.5M20 16H5M8.5 12.5 5 16l3.5 3.5',
 } as const;
 
 export type IconName = keyof typeof PATHS;

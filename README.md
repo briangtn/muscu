@@ -18,6 +18,7 @@ Application web mobile (PWA) pour suivre mes séances de musculation : programme
 - **Minuteurs** de repos et d'exercices chronométrés, avec bip et flash à la fin. L'écran reste allumé pendant la séance.
 - **Exercices bonus** proposés en fin de séance quand on a encore de l'énergie, choisis pour compléter la séance du jour.
 - **Passer un exercice ou arrêter une séance** en cours de route : rien n'est perdu, les séries faites sont enregistrées.
+- **Remplacer un exercice** quand la machine est prise, par une alternative qui travaille les mêmes muscles, avec son propre suivi des charges.
 - **Historique** avec un compte rendu par exercice : fait, partiel, passé ou non fait si la séance a été écourtée.
 - **Installable sur iPhone** (Safari → Partager → Sur l'écran d'accueil) et **utilisable hors ligne**.
 

@@ -71,7 +71,16 @@ export const PROGRAM: Record<TemplateId, SessionTemplate> = {
   },
 };
 
-/** Étapes d'une séance : celles du programme puis les bonus ajoutés en route. */
-export function stepsOf(log: WorkoutLog): Step[] {
+/** Étapes prévues d'une séance : celles du programme puis les bonus ajoutés en route. */
+export function plannedStepsOf(log: WorkoutLog): Step[] {
   return [...PROGRAM[log.templateId].steps, ...(log.extraSteps ?? [])];
+}
+
+/** Étapes réellement faites : les étapes prévues avec les exercices remplacés en séance. */
+export function stepsOf(log: WorkoutLog): Step[] {
+  return plannedStepsOf(log).map((step, i) => {
+    const swap = log.swaps?.[i];
+    // La note du programme concerne l'exercice prévu, pas son remplaçant.
+    return swap ? { ...step, exerciseId: swap, note: undefined } : step;
+  });
 }

@@ -1,6 +1,6 @@
 import { computed, effect, Injectable, signal } from '@angular/core';
 import { exercise } from './data/exercises';
-import { PROGRAM, stepsOf } from './data/program';
+import { plannedStepsOf, PROGRAM, stepsOf } from './data/program';
 import { EntryLog, SetLog, Step, TemplateId, WorkoutLog } from './models';
 import { suggest, Suggestion } from './progression';
 
@@ -92,6 +92,19 @@ export class WorkoutStore {
       if (!log) return log;
       const { stoppedAt, ...rest } = log;
       return { ...rest, cursor: Math.min(stoppedAt ?? log.cursor, stepsOf(log).length - 1) };
+    });
+  }
+
+  /** Remplace l'exercice d'une étape (machine prise) ; revenir à l'exercice prévu annule le remplacement. */
+  replace(index: number, exerciseId: string): void {
+    this.currentSignal.update((log) => {
+      if (!log) return log;
+      const swaps = { ...log.swaps };
+      if (plannedStepsOf(log)[index].exerciseId === exerciseId) delete swaps[index];
+      else swaps[index] = exerciseId;
+      const next = { ...log, swaps };
+      const entry = this.newEntry(stepsOf(next)[index]);
+      return { ...next, entries: next.entries.map((e, i) => (i === index ? entry : e)) };
     });
   }
 

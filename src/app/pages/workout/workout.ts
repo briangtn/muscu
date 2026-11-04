@@ -4,8 +4,9 @@ import { ExerciseAnimation } from '../../components/exercise-animation';
 import { ExerciseDetails } from '../../components/exercise-details';
 import { Icon } from '../../components/icon';
 import { Stepper } from '../../components/stepper';
-import { exercise } from '../../data/exercises';
-import { PROGRAM, stepsOf } from '../../data/program';
+import { SwapSheet } from '../../components/swap-sheet';
+import { alternativesOf, exercise } from '../../data/exercises';
+import { plannedStepsOf, PROGRAM, stepsOf } from '../../data/program';
 import { alertUser, celebrate, keepScreenOn } from '../../device';
 import { describeStep, formatClock, formatDuration, minutesBetween } from '../../format';
 import { BLOCK_LABELS, SetLog, Step } from '../../models';
@@ -24,7 +25,7 @@ function estimateMinutes(step: Step): number {
 
 @Component({
   selector: 'app-workout',
-  imports: [ExerciseAnimation, ExerciseDetails, Icon, RouterLink, Stepper],
+  imports: [ExerciseAnimation, ExerciseDetails, Icon, RouterLink, Stepper, SwapSheet],
   templateUrl: './workout.html',
   styleUrl: './workout.scss',
 })
@@ -53,6 +54,19 @@ export class Workout {
     const next = this.steps()[this.cursor() + 1];
     return next ? exercise(next.exerciseId) : undefined;
   });
+  /** Exercice prévu par le programme à cette étape, même s'il a été remplacé. */
+  protected readonly plannedExercise = computed(() => {
+    const log = this.log();
+    const planned = log && plannedStepsOf(log)[this.cursor()];
+    return planned ? exercise(planned.exerciseId) : undefined;
+  });
+  /** L'exercice prévu puis ses alternatives ; vide si l'exercice n'en a pas. */
+  protected readonly swapOptions = computed(() => {
+    const planned = this.plannedExercise();
+    const alternatives = planned ? alternativesOf(planned.id) : [];
+    return alternatives.length ? [planned!, ...alternatives] : [];
+  });
+  protected readonly swapOpen = signal(false);
   protected readonly suggestion = computed(() => {
     const step = this.step();
     return step ? this.store.suggest(step) : null;
@@ -229,6 +243,15 @@ export class Workout {
   protected finish(): void {
     this.store.finish();
     this.router.navigate(['/']);
+  }
+
+  protected replaceExercise(exerciseId: string): void {
+    this.swapOpen.set(false);
+    if (exerciseId === this.step()?.exerciseId) return;
+    if (this.hasDoneSet() && !confirm('Les séries déjà faites sur cet exercice seront effacées. Remplacer quand même ?')) return;
+    this.resetTimer();
+    this.restEndsAt.set(null);
+    this.store.replace(this.cursor(), exerciseId);
   }
 
   protected showDetails(): void {
